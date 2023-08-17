@@ -14,7 +14,7 @@ require __DIR__ . '/api/authentication.php';
 require __DIR__ . '/api/update.php';
 
 $app->get('/', function (Request $request, Response $response, $args) {
-    $response->getBody()->write("Hello world!");
+    $response->getBody()->write("Hello worlddddddddddd!");
     return $response;
 });
 
