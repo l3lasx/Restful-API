@@ -15,23 +15,24 @@ $app->post('/employee/update', function (Request $request, Response $response, $
 
     function getPasswordIndB($conn, $email)
     {
-        $stmt = $conn->prepare("SELECT password FROM employees WHERE email = ?");
+        $stmt = $conn->prepare("SELECT * FROM employees WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();
 
         $result = $stmt->get_result();
         if ($result->num_rows == 1) {
             $row = $result->fetch_assoc();
-            return $row["password"];
+            return $row;
         } else {
             return "";
         }
     }
 
+    //asociative array
     $pwdInDb = getPasswordIndB($conn, $email);
 
-    if (password_verify($pwd, $pwdInDb)) {
-        if (password_verify($new_pwd, $pwdInDb) && password_verify($confirm_pwd, $pwdInDb)) {
+    if (password_verify($pwd, $pwdInDb["password"])) {
+        if (password_verify($new_pwd, $pwdInDb["password"]) && password_verify($confirm_pwd, $pwdInDb["password"])) {
             $response->getBody()->write(json_encode(["message" => "Duplicate old password"]));
             return $response->withHeader("Content-Type", "application/json")->withStatus(201);
         } else {
@@ -41,8 +42,8 @@ $app->post('/employee/update', function (Request $request, Response $response, $
             } else {
                 //hash password
                 $hash_pwd = password_hash($new_pwd, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE employees SET password = ?");
-                $stmt->bind_param("s", $hash_pwd);
+                $stmt = $conn->prepare("UPDATE employees SET password = ? WHERE employeeNumber = ?");
+                $stmt->bind_param("si", $hash_pwd, $pwdInDb["employeeNumber"]);
                 $stmt->execute();
 
                 $response->getBody()->write(json_encode(["message" => "Update password Successfylly"]));
