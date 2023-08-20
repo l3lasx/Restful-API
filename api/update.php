@@ -42,8 +42,8 @@ $app->post('/employee/update', function (Request $request, Response $response, $
             } else {
                 //hash password
                 $hash_pwd = password_hash($new_pwd, PASSWORD_DEFAULT);
-                $stmt = $conn->prepare("UPDATE employees SET password = ? WHERE employeeNumber = ?");
-                $stmt->bind_param("si", $hash_pwd, $pwdInDb["employeeNumber"]);
+                $stmt = $conn->prepare("UPDATE employees SET password = ? WHERE email = ?");
+                $stmt->bind_param("si", $hash_pwd, $pwdInDb["email"]);
                 $stmt->execute();
 
                 $response->getBody()->write(json_encode(["message" => "Update password Successfylly"]));
